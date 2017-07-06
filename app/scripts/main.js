@@ -14,11 +14,13 @@ function District(name, filename, countTrees, coordinates) {
 }
 
 // Model class for a tree
-function Tree(name, latin_name, age, position) {
+function Tree(id, name, latin_name, facility, age, position) {
     var self = this;
+    self.id = parseInt(id || '0');
     self.name = name || '';
     self.latin_name = latin_name || '';
-    self.age = age || '0';
+    self.age = parseInt(age || '0');
+    self.facility = facility || '';
     self.position = position || [];
 }
 
@@ -26,18 +28,38 @@ function Tree(name, latin_name, age, position) {
 function MainViewModel(mapHandler) {
     var self = this;
 
+    self.test = ko.observable(false);
+    
     self.mapHandler = mapHandler;
-    self.subscriptionPaused = true;
     self.shouldShowSidebar = ko.observable(true);
     self.selectedDistrict = ko.observable();
     self.selectedTreeType = ko.observable();
     self.selectedTreeAge = ko.observable();
+    
     self.districts = ko.observableArray().extend({ rateLimit: 50 });
     self.trees = [];
     self.visibleTrees = ko.observableArray().extend({ rateLimit: 50 });
-    self.treeTypes = ko.observableArray().extend({ rateLimit: 50 });
-    self.treeAges = ko.observableArray(['<all>', '< 50', '50 - 99', '100 - 149', '150 - 199', '>= 200']);
-    self.treeMapTimer = null;
+    self.treeTypes = ko.observableArray().extend({ rateLimit: 50 });    
+    self.treeAges = ko.observableArray(['< 50', '50 - 99', '100 - 149', '150 - 199', '>= 200']);
+    
+    // Gets called when either tree age or tree type changed
+    ko.computed(function() {
+        if (self.treeTypes().length<=0) 
+            return;
+        var params = { treeAge: self.selectedTreeAge(), treeType: self.selectedTreeType() };
+        console.log('computed age n treetype ', params);
+        self.test(!self.test());
+    }).extend({ deferred: true, rateLimit: 100 });
+    
+    // Gets called when selected district changed
+    ko.computed(function() {
+        var district = self.selectedDistrict();
+        if (self.loadTrees) {
+            self.selectedTreeType(null);
+            self.selectedTreeAge(null);
+            self.loadTrees(district);
+        }
+    }).extend({ deferred: true, rateLimit: 100 });
 
     $(window).on('resize', function() {
         var win = $(window);
@@ -45,28 +67,6 @@ function MainViewModel(mapHandler) {
         self.shouldShowSidebar(win.width() > 600);
     });
 
-    self.selectedDistrict.subscribe(function(newValue) {
-        console.log("the new district is " + newValue.name);
-        self.loadTrees();
-    });
-    
-    self.subscribeTreeType = function() {
-        self.subscriptionTreeType = self.selectedTreeType.subscribe(function(newValue) {
-            console.log(self.subscriptionPaused);
-            if (self.subscriptionPaused)
-                return;
-            console.log("the new tree type is " + newValue);
-            self.loadTrees();
-        });
-    };
-    /*self.selectedTreeType.subscribe(function(newValue) {
-        console.log(self.subscriptionPaused);
-        if (self.subscriptionPaused)
-            return;
-        console.log("the new tree type is " + newValue);
-        self.loadTrees();
-    });*/
-    
     self.toggleSidebar = function() {
         self.shouldShowSidebar(!self.shouldShowSidebar());
         // TODO: does not seem to work correctly. Switch to sidebar as overlay.
@@ -75,7 +75,7 @@ function MainViewModel(mapHandler) {
 
     self.loadDistricts = function(completeCallback) {
         console.log('loadDistricts');
-        $.getJSON("./data/districts.json")
+        $.getJSON('./data/districts.json')
         .done(function(result) {
             self.districts.removeAll();
             for (var i=0; i<result.districts.length; i++) {
@@ -98,59 +98,41 @@ function MainViewModel(mapHandler) {
         });
     };
     
-    self._loadTrees = function() {
+    self.loadTrees = function() {
         console.log('_loadTrees');
-        console.log('' + self.selectedDistrict());
         if (!self.selectedDistrict() || !self.selectedDistrict().filename)
             return;
-        console.log('./data/'+self.selectedDistrict().filename);
         $.getJSON('./data/'+self.selectedDistrict().filename)
         .done(function(result) {
-            if (self.subscriptionTreeType)
-                self.subscriptionTreeType.dispose();
-            self.subscriptionPaused = true;
             console.log('loadTrees - data loaded');
-            console.log('./data/'+self.selectedDistrict().filename);
             self.selectedDistrict().setCoordinates(result.coordinates);
             self.treeTypes.removeAll();
+            self.trees = [];
             for (var i=0; i<result.trees.length; i++) {
                 var data = result.trees[i];
-                self.trees.push(new District(
-                    data.name,
-                    data.filename,
-                    data.totalTreeCount
+                self.trees.push(new Tree(
+                    data.id,
+                    data.german_name,
+                    data.latin_name,
+                    data.facility,
+                    data.age,
+                    data.coordinates
                 ));
                 if (self.treeTypes.indexOf(data.latin_name)<0)
                     self.treeTypes.push(data.latin_name);
             }
             self.treeTypes.sort();
-            self.treeTypes.unshift('<all>');
-
+            
             self.mapHandler.changeDistrict(self.selectedDistrict().coordinates);
             console.log('loadTrees - end');
-            self.subscriptionPaused = false;            
-            self.subscribeTreeType();
         })
         .fail(function(err) {
             // TODO: show error message to user
             console.log('loadTrees - data cannot be loaded '+err);
         });
     };
-
-    self.timer = null;
-    self.loadTrees = function() {
-        self._loadTrees();
-    };
     
-    
-    self.loadDistricts(function() {
-        /*console.log('self.districts()[0] = ');
-        console.log(self.districts()[0]);
-        self.selectedDistrict(self.districts()[0]);
-        console.log('self.selectedDistrict() = ');
-        console.log(self.selectedDistrict());
-        self._loadTrees();*/
-    });
+    self.loadDistricts();
 }
 
 
@@ -158,6 +140,7 @@ function initMap() {
     var mapHandler = new MapHandler();
     mapHandler.init();
 
+    //ko.options.deferUpdates = true;
     var mainViewModel = new MainViewModel(mapHandler);
     ko.applyBindings(mainViewModel);
 
