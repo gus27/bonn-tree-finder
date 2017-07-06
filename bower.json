@@ -1,0 +1,24 @@
+{
+  "name": "test",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "components-font-awesome": "^4.7.0",
+    "knockout": "^3.4.2",
+    "lokijs": "^1.5.0"
+  },
+  "overrides": {
+    "bootstrap": {
+      "main": [
+        "less/bootstrap.less",
+        "dist/css/bootstrap.css",
+        "dist/js/bootstrap.js",
+        "dist/fonts/*"
+      ]
+    }
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2"
+  }
+}

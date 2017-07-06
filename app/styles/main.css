@@ -1,0 +1,132 @@
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 0;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: #474f87;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    overflow-x: hidden;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    padding: 0px;
+    -webkit-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
+    box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;    
+    z-index: 1;
+}
+
+/* 
+If the width is greater than 600px the map area will shrink
+when the sidebar is visible. 
+When the width is smaller than 600px the map will not shrink 
+any more but moved off screen. Otherwise on small screens the
+Google Maps fitBounds function will calculate a very small 
+zoom factor.
+*/
+@media (min-width: 600px) {
+    #wrapper.toggled #page-content-wrapper {
+        width: calc(100% - 250px);
+    }
+}
+
+.sidebar-nav {
+    /*position: absolute;*/
+    top: 0;
+    width: 250px;
+    height: 210px;
+    margin: 0;
+    padding: 15px;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin: 5px 0px;
+}
+
+.sidebar-list {
+    height: calc(100% - 220px);
+    background-color: white;
+}
+
+.map-wrapper {
+    margin: 50px 0 0 0;
+    padding: 0;
+    width: 100%;
+    height: calc(100% - 50px);
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+/* TODO: my-navbar umbenennen */
+.my-navbar {
+    position: fixed;
+    height: 50px;
+    top: 0;
+    border-width: 0 0 1px;
+}
+
+.my-navbar button {
+    float: left;
+    margin: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 3px;
+    font-size: 2em;
+}
+
+.my-navbar button:focus {
+    outline-style: none;
+}
+
+.form-group label {
+    color: gray;
+}
+
+.input-group-addon {
+    min-width: 60px;
+    padding: 0;
+}
