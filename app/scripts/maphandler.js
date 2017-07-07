@@ -33,13 +33,13 @@ function MapHandler() {
     };
     
     // Adds a marker to the map and push to the array.
-    function addMarker(location) {
+    self.addMarker = function(location) {
         var marker = new google.maps.Marker({
             position: location,
             map: map
         });
         self.markers.push(marker);
-    }    
+    };
 
     self.changeDistrict = function(coordsDistrict, trees) {
         if (self.currentDistrictPolygon) 
