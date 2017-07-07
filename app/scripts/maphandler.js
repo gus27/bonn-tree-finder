@@ -3,6 +3,7 @@ function MapHandler() {
 
     self.map = null;
     self.currentDistrictPolygon = null;
+    self.markers = [];
     
     // Create a styles array to use with the map.
     // Make the green areas look light-brown to avoid 
@@ -30,20 +31,30 @@ function MapHandler() {
           }
         });
     };
+    
+    // Adds a marker to the map and push to the array.
+    function addMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+        self.markers.push(marker);
+    }    
 
     self.changeDistrict = function(coordsDistrict, trees) {
         if (self.currentDistrictPolygon) 
             self.currentDistrictPolygon.setMap(null);
         self.currentDistrictPolygon = new google.maps.Polygon({
-          paths: coordsDistrict,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#FFFF00',
-          fillOpacity: 0.1
+            paths: coordsDistrict,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FFFF00',
+            fillOpacity: 0.1
         });
         self.currentDistrictPolygon.setMap(self.map);
-        self.map.fitBounds(self.getBoundsFromPolygon(self.currentDistrictPolygon));            
+        self.map.fitBounds(self.getBoundsFromPolygon(self.currentDistrictPolygon));
+                
     };
     
     self.checkResize = function() {
