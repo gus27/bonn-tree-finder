@@ -116,7 +116,7 @@ function MainViewModel(mapHandler) {
                 var data = result.trees[i];
                 
                 self.dbTrees.insert(new Tree(
-                    data.index,
+                    i,
                     data.id,
                     data.german_name,
                     data.latin_name,
@@ -147,7 +147,7 @@ function MainViewModel(mapHandler) {
 
 function initMap() {
     var mapHandler = new MapHandler();
-    mapHandler.init();
+    mapHandler.init('map');
 
     //ko.options.deferUpdates = true;
     var mainViewModel = new MainViewModel(mapHandler);
