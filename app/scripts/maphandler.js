@@ -7,10 +7,11 @@ function MapHandler() {
     self.map = null;
     self.markerClusterer = null;
     self.currentDistrictPolygon = null;
+    self.currentDistrictBounds = null;
     self.markers = {};
+    self.visibleMarkers = [];
     // Cache for already created icons
     self.markerIconCache = {};
-    self.markerCluster = null;
 
     // Create a styles array to use with the map.
     // Make the green areas look light-brown to avoid
@@ -122,13 +123,10 @@ function MapHandler() {
             fillOpacity: 0.1
         });
         self.currentDistrictPolygon.setMap(self.map);
-        self.map.fitBounds(self.getBoundsFromPolygon(self.currentDistrictPolygon));
+        self.currentDistrictBounds = self.getBoundsFromPolygon(self.currentDistrictPolygon);
+        self.map.fitBounds(self.currentDistrictBounds);
 
         self.addMarkers(trees);
-        self.showAllMarkers(trees);
-
-        console.log('Number of markers: '+Object.keys(self.markers).length);
-        console.log('Number of marker icons: '+Object.keys(self.markerIconCache).length);
     };
 
     self.checkResize = function() {
@@ -172,51 +170,58 @@ function MapHandler() {
     };
 
     // Sets the map on all markers in the tree.
-    self.setMapOnForMarkers = function(map, trees) {
-        console.log('setMapOnForMarkers '+map);
-        if (trees) {
-            for (var i = 0; i < trees.length; i++) {
-                self.markers[trees[i].index].setMap(self.map);
+    self.setMapForAllMarkers = function(map) {
+        for (var property in self.markers) {
+            if (self.markers.hasOwnProperty(property)) {
+                self.markers[property].setMap(map);
             }
-        } else {
-            for (var property in self.markers) {
-                if (self.markers.hasOwnProperty(property)) {
-                    self.markers[property].setMap(map);
-                }
-            }
+        }
+        if (map)
+            self.visibleMarkers = Object.keys(self.markers).map(function(e) {
+                return self.markers[e];
+            });
+        else
+            self.visibleMarkers = [];
+        self.mapBounds = self.districtBounds;
+    }    
+    
+    // Switches map on for markers in the tree array.
+    self.setMapOnForMarkers = function(trees) {
+        self.visibleMarkers = [];
+        self.mapBounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < trees.length; i++) {
+            self.markers[trees[i].index].setMap(self.map);
+            self.visibleMarkers.push(self.markers[trees[i].index]);
+            self.mapBounds.extend(trees[i].position);
         }
     };
     
     self.showMarkerCluster = function() {
-        var count = 0;
-        var visibleMarkers = [];
-        for (var property in self.markers) {
-            if (self.markers.hasOwnProperty(property) && self.markers[property].getMap()!=null) {
-                visibleMarkers.push(self.markers[property]);
-                count += 1;
-            }
-        }
-        if (count>=100)
-            self.markerClusterer.addMarkers(visibleMarkers);
+        if (self.visibleMarkers.length>=100)
+            self.markerClusterer.addMarkers(self.visibleMarkers);
     };
 
     // Removes the markers from the map, but keeps them in the array.
     self.clearMarkers = function() {
-        self.setMapOnForMarkers(null);
+        self.setMapForAllMarkers(null);
         self.markerClusterer.clearMarkers();
     };
 
-    // Shows any markers currently in the array.
+    // Shows all markers.
     self.showAllMarkers = function() {
-        self.setMapOnForMarkers(self.map);
+        console.log('showAllMarkers');
+        self.setMapForAllMarkers(self.map);
         self.showMarkerCluster();
+        //self.map.fitBounds(self.mapBounds);
     };
 
     // Shows markers in the trees array.
     self.showMarkers = function(trees) {
+        console.log('showMarkers');
         self.clearMarkers();
-        self.setMapOnForMarkers(self.map, trees);
+        self.setMapOnForMarkers(trees);
         self.showMarkerCluster();
+        //self.map.fitBounds(self.mapBounds);        
     };
 
     // Deletes all markers in the array by removing references to them.

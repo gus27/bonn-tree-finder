@@ -29,7 +29,7 @@ function Tree(index, id, name, latin_name, facility, age, position) {
 function MainViewModel(mapHandler) {
     var self = this;
 
-    self.test = ko.observable(false);
+    self.nameFieldname = 'german_name'; // latin_name
 
     self.mapHandler = mapHandler;
     self.shouldShowSidebar = ko.observable(true);
@@ -50,10 +50,40 @@ function MainViewModel(mapHandler) {
     ko.computed(function() {
         if (self.treeTypes().length<=0)
             return;
-        var params = { treeAge: self.selectedTreeAge(), treeType: self.selectedTreeType() };
-        console.log('computed age/treetype ', params);
-        self.test(!self.test());
-    }).extend({ deferred: true, rateLimit: 100 });
+        var idx, filters;
+        
+        filters = [];
+        idx = self.treeAges.indexOf(self.selectedTreeAge());
+        if (idx >= 0) {
+            var condition = null;
+            switch (idx) {
+                case 1:
+                    condition = { '$between': [50, 99] };
+                    break;
+                case 2:
+                    condition = { '$between': [100, 149] };
+                    break;
+                case 3:
+                    condition = { '$between': [150, 199] };
+                    break;
+                case 4:
+                    condition = { '$gte': 200 };
+                    break;
+                default:
+                    condition = { '$lt': 50 };
+                    break;
+            }
+            filters.push({'age' : condition});
+        }
+        
+        if (self.selectedTreeType()) {
+            filters.push({ 'name': { '$eq': self.selectedTreeType() }});
+        }
+        
+        console.log('computed age/treetype ', filters);
+        
+        self.mapHandler.showMarkers(self.dbTrees.find({ '$and': filters }));
+    }).extend({ deferred: true, rateLimit: 200 });
 
     // Gets called when selected district changed
     ko.computed(function() {
@@ -118,14 +148,14 @@ function MainViewModel(mapHandler) {
                 self.dbTrees.insert(new Tree(
                     i,
                     data.id,
-                    data.german_name,
+                    data[self.nameFieldname],
                     data.latin_name,
                     data.facility,
                     data.age,
                     data.coordinates
                 ));
-                if (self.treeTypes.indexOf(data.latin_name)<0)
-                    self.treeTypes.push(data.latin_name);
+                if (self.treeTypes.indexOf(data[self.nameFieldname])<0)
+                    self.treeTypes.push(data[self.nameFieldname]);
             }
             self.treeTypes.sort();
 
