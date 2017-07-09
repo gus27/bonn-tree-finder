@@ -87,6 +87,7 @@ zoom factor.
 .sidebar-list {
     height: calc(100% - 220px);
     background-color: white;
+    overflow-y: scroll;
 }
 
 .map-wrapper {

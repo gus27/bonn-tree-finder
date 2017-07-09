@@ -43,7 +43,7 @@ function MapHandler() {
             self.map,
             [],
             {
-                imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
+                imagePath: './images/m',
                 gridSize: 30,
                 maxZoom: 17
             }
@@ -95,7 +95,7 @@ function MapHandler() {
             // mouses over the marker.
             var highlightedIcon = self.makeMarkerIcon('FFFF24', tree.age);
 
-            var title = tree.latin_name + ' (' + tree.age + ')\n' + tree.facility;
+            var title = tree.name + ' (' + tree.age + ')\n' + tree.facility;
 
             self.addMarker({
                 index: tree.index,
@@ -217,7 +217,7 @@ function MapHandler() {
 
     // Shows markers in the trees array.
     self.showMarkers = function(trees) {
-        console.log('showMarkers');
+        console.log('showMarkers '+trees.length);
         self.clearMarkers();
         self.setMapOnForMarkers(trees);
         self.showMarkerCluster();

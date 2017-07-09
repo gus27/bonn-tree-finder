@@ -32,28 +32,43 @@ function MainViewModel(mapHandler) {
     self.nameFieldname = 'german_name'; // latin_name
 
     self.mapHandler = mapHandler;
+    self.initialized = ko.observable(false);
     self.shouldShowSidebar = ko.observable(true);
     self.selectedDistrict = ko.observable();
     self.selectedTreeType = ko.observable();
     self.selectedTreeAge = ko.observable();
+    self.inputStreetName = ko.observable();
 
-    self.districts = ko.observableArray().extend({ rateLimit: 50 });
-    self.visibleTrees = ko.observableArray().extend({ rateLimit: 50 });
-    self.treeTypes = ko.observableArray().extend({ rateLimit: 50 });
+    self.districts = ko.observableArray(); //.extend({ rateLimit: 50 });
+    self.visibleTrees = ko.observableArray(); //.extend({ rateLimit: 50 });
+    self.treeTypes = ko.observableArray(); //.extend({ rateLimit: 50 });
     self.treeAges = ko.observableArray(['< 50', '50 - 99', '100 - 149', '150 - 199', '>= 200']);
 
     //self.trees = [];
     self.db = new loki('example.db');
     self.dbTrees = self.db.addCollection('trees');
 
-    // Gets called when either tree age or tree type changed
-    ko.computed(function() {
-        if (self.treeTypes().length<=0)
-            return;
-        var idx, filters;
+    $(window).on('resize', function() {
+        var win = $(window);
+        /* If there is enough space (> 600px), we open the sidebar. */
+        self.shouldShowSidebar(win.width() > 600);
+    });
+
+    self.toggleSidebar = function() {
+        self.shouldShowSidebar(!self.shouldShowSidebar());
+        // TODO: does not seem to work correctly. Switch to sidebar as overlay.
+        self.mapHandler.checkResize();
+    };
+
+    self.filterTrees = function(params) {
+        var idx, filters, result;
         
+        params.treeType = params.treeType || self.selectedTreeType();
+        params.treeAge = params.treeAge || self.selectedTreeAge();
+        params.streetName = params.streetName || self.inputStreetName();
+
         filters = [];
-        idx = self.treeAges.indexOf(self.selectedTreeAge());
+        idx = self.treeAges.indexOf(params.treeAge);
         if (idx >= 0) {
             var condition = null;
             switch (idx) {
@@ -75,39 +90,21 @@ function MainViewModel(mapHandler) {
             }
             filters.push({'age' : condition});
         }
-        
-        if (self.selectedTreeType()) {
-            filters.push({ 'name': { '$eq': self.selectedTreeType() }});
+
+        if (params.treeType) {
+            filters.push({ 'name': { '$eq': params.treeType }});
+        }
+
+        if (params.streetName) {
+            filters.push({ 'facility': { '$regex': [params.streetName, 'i'] }});
         }
         
-        console.log('computed age/treetype ', filters);
-        
-        self.mapHandler.showMarkers(self.dbTrees.find({ '$and': filters }));
-    }).extend({ deferred: true, rateLimit: 200 });
+        result = self.dbTrees.find({ '$and': filters });
+        self.mapHandler.showMarkers(result);
+        self.visibleTrees(result);
+    };
 
-    // Gets called when selected district changed
-    ko.computed(function() {
-        var district = self.selectedDistrict();
-        if (self.loadTrees) {
-            self.selectedTreeType(null);
-            self.selectedTreeAge(null);
-            self.loadTrees(district);
-        }
-    }).extend({ deferred: true, rateLimit: 100 });
-
-    $(window).on('resize', function() {
-        var win = $(window);
-        /* If there is enough space (> 600px), we open the sidebar. */
-        self.shouldShowSidebar(win.width() > 600);
-    });
-
-    self.toggleSidebar = function() {
-        self.shouldShowSidebar(!self.shouldShowSidebar());
-        // TODO: does not seem to work correctly. Switch to sidebar as overlay.
-        self.mapHandler.checkResize();
-    }
-
-    self.loadDistricts = function(completeCallback) {
+    self.loadDistricts = function() {
         console.log('loadDistricts');
         $.getJSON('./data/districts.json')
         .done(function(result) {
@@ -123,8 +120,6 @@ function MainViewModel(mapHandler) {
             self.districts.sort(function (left, right) {
                 return left.name == right.name ? 0 : (left.name < right.name ? -1 : 1);
             });
-            if (completeCallback)
-                completeCallback();
         })
         .fail(function(err) {
             // TODO: show error message to user
@@ -144,7 +139,7 @@ function MainViewModel(mapHandler) {
             self.dbTrees.removeDataOnly();
             for (var i=0; i<result.trees.length; i++) {
                 var data = result.trees[i];
-                
+
                 self.dbTrees.insert(new Tree(
                     i,
                     data.id,
@@ -163,6 +158,8 @@ function MainViewModel(mapHandler) {
                 self.selectedDistrict().coordinates,
                 self.dbTrees.find()
             );
+            self.initialized(true);            
+            
             console.log('loadTrees - end');
         })
         .fail(function(err) {
@@ -171,6 +168,29 @@ function MainViewModel(mapHandler) {
         });
     };
 
+    // Gets called when either tree age, tree type or street name changed
+    ko.computed(function() {
+        if (!self.initialized())
+            return;
+        console.log('computed age/treetype ');
+        self.filterTrees({ 
+            treeType: self.selectedTreeType(), 
+            treeAge: self.selectedTreeAge(),
+            streetName: self.inputStreetName()
+        });
+    }).extend({ deferred: true, rateLimit: 400, method: "notifyWhenChangesStop" });
+
+    // Gets called when selected district changed
+    ko.computed(function() {
+        var district = self.selectedDistrict();
+        if (self.loadTrees) {
+            self.selectedTreeType(null);
+            self.selectedTreeAge(null);
+            self.inputStreetName(null);
+            self.loadTrees(district);
+        }
+    }).extend({ deferred: true, rateLimit: 100 });    
+    
     self.loadDistricts();
 }
 
