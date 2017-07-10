@@ -55,7 +55,9 @@ function MapHandler() {
         var marker = new google.maps.Marker(params);
 
         // Create an onclick event to open the large infowindow at each marker.
-        marker.addListener('click', function() {
+        marker.addListener('click', function(event) {
+            //console.log('marker click', this, event);
+            console.log('http://maps.google.com/maps?q=loc:'+this.position.lat()+','+this.position.lng());
             self.populateInfoWindow(this, largeInfowindow);
         });
         // Two event listeners - one for mouseover, one for mouseout,
