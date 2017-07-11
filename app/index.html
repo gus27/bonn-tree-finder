@@ -58,11 +58,13 @@
                 </li>
             </ul>
             <lazy-tree-list params="mylist: $root.visibleTrees, class: 'sidebar-list'">
+                <div data-bind="click: $root.listClicked">
                 <div><span data-bind="text: item.name"></span> (<span data-bind="text: item.age"></span> years)</div>
                 <div data-bind="text: latin_name"></div>
                 <div data-bind="text: id"></div>
                 <div data-bind="text: facility"></div>
                 <hr/>
+                </div>
             </lazy-tree-list>
         </div>
         

@@ -59,6 +59,11 @@ function MainViewModel(mapHandler) {
         // TODO: does not seem to work correctly. Switch to sidebar as overlay.
         self.mapHandler.checkResize();
     };
+    
+    self.listClicked = function(element, event) {
+        console.log('listClicked', element, event);        
+        self.mapHandler.animateMarker(element);
+    };
 
     self.filterTrees = function(params) {
         var idx, filters, result;

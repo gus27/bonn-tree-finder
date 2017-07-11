@@ -26,7 +26,7 @@ function MapHandler() {
             ]
         }
     ];
-    
+
 
     self.init = function (elementId) {
         self.map = new google.maps.Map(document.getElementById(elementId), {
@@ -51,7 +51,7 @@ function MapHandler() {
     };
 
     // Adds a marker to the map and push to the array.
-    self.addMarker = function (params) {
+    self.addMarker_ = function (params) {
         var marker = new google.maps.Marker(params);
 
         // Create an onclick event to open the large infowindow at each marker.
@@ -78,7 +78,7 @@ function MapHandler() {
     };
 
     // Adds all marker by push to the array.
-    self.addMarkers = function (trees) {
+    self.addMarkers_ = function (trees) {
         // ageColors contains 5 different colors for the map markers:
         // from light green (young trees) to dark green (old trees).
         var ageColors = ['7CFC33', '63CA29', '54AC22', '47921D', '397517'];
@@ -92,14 +92,14 @@ function MapHandler() {
             var ageIdx = Math.min(Math.floor(tree.age / 50), ageColors.length-1);
 
             // This will be the default tree marker icon.
-            var defaultIcon = self.makeMarkerIcon(ageColors[ageIdx], tree.age);
+            var defaultIcon = self.makeMarkerIcon_(ageColors[ageIdx], tree.age);
             // This is a "highlighted location" marker for when the user
             // mouses over the marker.
-            var highlightedIcon = self.makeMarkerIcon('FFFF24', tree.age);
+            var highlightedIcon = self.makeMarkerIcon_('FFFF24', tree.age);
 
             var title = tree.name + ' (' + tree.age + ')\n' + tree.facility;
 
-            self.addMarker({
+            self.addMarker_({
                 index: tree.index,
                 position: tree.position,
                 title: title,
@@ -109,10 +109,27 @@ function MapHandler() {
                 optimized: false
             });
         }
-    }
+    };
+
+    // Animate marker for tree for 3 seconds
+    self.animateMarker = function (tree) {
+        var marker = self.markers[tree.index];
+        google.maps.event.trigger(map, "resize");
+        self.map.setZoom(18);
+        self.map.panTo(marker.getPosition());
+
+        // It takes the map a moment to zoom in and pan, so
+        // the animation is started after a short delay:
+        setTimeout(function() {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+                marker.setAnimation(null);
+            }, 3000);
+        }, 500);
+    };
 
     self.changeDistrict = function(coordsDistrict, trees) {
-        self.deleteMarkers();
+        self.deleteMarkers_();
 
         if (self.currentDistrictPolygon)
             self.currentDistrictPolygon.setMap(null);
@@ -125,17 +142,17 @@ function MapHandler() {
             fillOpacity: 0.1
         });
         self.currentDistrictPolygon.setMap(self.map);
-        self.currentDistrictBounds = self.getBoundsFromPolygon(self.currentDistrictPolygon);
+        self.currentDistrictBounds = self.getBoundsFromPolygon_(self.currentDistrictPolygon);
         self.map.fitBounds(self.currentDistrictBounds);
 
-        self.addMarkers(trees);
+        self.addMarkers_(trees);
     };
 
     self.checkResize = function() {
         google.maps.event.trigger(self.map, 'resize');
     };
 
-    self.getBoundsFromPolygon = function(polygon) {
+    self.getBoundsFromPolygon_ = function(polygon) {
         var bounds = new google.maps.LatLngBounds();
         var paths = polygon.getPaths();
         for (var i = 0; i < paths.getLength(); i++) {
@@ -151,7 +168,7 @@ function MapHandler() {
     // containing the text parameter string.
     // The icon will be 21 px wide by 34 high, have an origin
     // of 0, 0 and be anchored at 10, 34).
-    self.makeMarkerIcon = function(markerColor, text) {
+    self.makeMarkerIcon_ = function(markerColor, text) {
         text = text || '%E2%80%A2';
 
         // Cache already existing icons
@@ -172,7 +189,7 @@ function MapHandler() {
     };
 
     // Sets the map on all markers in the tree.
-    self.setMapForAllMarkers = function(map) {
+    self.setMapForAllMarkers_ = function(map) {
         for (var property in self.markers) {
             if (self.markers.hasOwnProperty(property)) {
                 self.markers[property].setMap(map);
@@ -185,10 +202,10 @@ function MapHandler() {
         else
             self.visibleMarkers = [];
         self.mapBounds = self.districtBounds;
-    }    
-    
-    // Switches map on for markers in the tree array.
-    self.setMapOnForMarkers = function(trees) {
+    }
+
+    // Switches map on for markers in the trees array.
+    self.setMapOnForMarkers_ = function(trees) {
         self.visibleMarkers = [];
         self.mapBounds = new google.maps.LatLngBounds();
         for (var i = 0; i < trees.length; i++) {
@@ -197,38 +214,38 @@ function MapHandler() {
             self.mapBounds.extend(trees[i].position);
         }
     };
-    
-    self.showMarkerCluster = function() {
+
+    self.showMarkerCluster_ = function() {
         if (self.visibleMarkers.length>=100)
             self.markerClusterer.addMarkers(self.visibleMarkers);
     };
 
     // Removes the markers from the map, but keeps them in the array.
-    self.clearMarkers = function() {
-        self.setMapForAllMarkers(null);
+    self.clearMarkers_ = function() {
+        self.setMapForAllMarkers_(null);
         self.markerClusterer.clearMarkers();
     };
 
     // Shows all markers.
     self.showAllMarkers = function() {
         console.log('showAllMarkers');
-        self.setMapForAllMarkers(self.map);
-        self.showMarkerCluster();
+        self.setMapForAllMarkers_(self.map);
+        self.showMarkerCluster_();
         //self.map.fitBounds(self.mapBounds);
     };
 
     // Shows markers in the trees array.
     self.showMarkers = function(trees) {
         console.log('showMarkers '+trees.length);
-        self.clearMarkers();
-        self.setMapOnForMarkers(trees);
-        self.showMarkerCluster();
-        //self.map.fitBounds(self.mapBounds);        
+        self.clearMarkers_();
+        self.setMapOnForMarkers_(trees);
+        self.showMarkerCluster_();
+        //self.map.fitBounds(self.mapBounds);
     };
 
     // Deletes all markers in the array by removing references to them.
-    self.deleteMarkers = function() {
-        self.clearMarkers();
+    self.deleteMarkers_ = function() {
+        self.clearMarkers_();
         self.markers = {};
         // reset the cache for the marker icons
         self.markerIconCache = {};
