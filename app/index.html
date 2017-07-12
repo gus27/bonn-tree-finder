@@ -57,6 +57,7 @@
                     </div>
                 </li>
             </ul>
+            <div><span data-bind="text: visibleTreesFound"></span></div>
             <lazy-tree-list params="mylist: $root.visibleTrees, class: 'sidebar-list'">
                 <div data-bind="click: $root.listClicked">
                 <div><span data-bind="text: item.name"></span> (<span data-bind="text: item.age"></span> years)</div>
@@ -88,7 +89,6 @@
 
     </div>
     <!-- /#wrapper -->
-
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->

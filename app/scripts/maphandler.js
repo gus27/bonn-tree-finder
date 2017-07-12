@@ -12,10 +12,10 @@ function MapHandler() {
     self.visibleMarkers = [];
     // Cache for already created icons
     self.markerIconCache = {};
-    self.largeInfowindow = new google.maps.InfoWindow({width:500,maxWidth:500});
+    self.largeInfowindow = new google.maps.InfoWindow({maxWidth:400});
 
     // Create a styles array to use with the map.
-    // Make the green areas look light-brown to avoid
+    // Make the green areas look light-brown to reduce
     // distractions from our green tree markers
     var styles = [
         {
@@ -27,7 +27,6 @@ function MapHandler() {
             ]
         }
     ];
-
 
     self.init = function (elementId) {
         self.map = new google.maps.Map(document.getElementById(elementId), {
@@ -57,27 +56,19 @@ function MapHandler() {
 
         // Create an onclick event to open the large infowindow at each marker.
         marker.addListener('click', function(event) {
-            console.log('marker click', this, event);
-            console.log('http://maps.google.com/maps?q=loc:'+this.position.lat()+','+this.position.lng());
-            var article = new WikipediaPage();
-            article.load(this.latin_name, function(page, successFlag, errorMessage) {
-                if (successFlag) {
-                    self.populateInfoWindow(marker, self.largeInfowindow, page);
-                } else {
-                    self.populateInfoWindow(marker, self.largeInfowindow, errorMessage);
-                }
-            });
+            console.log('marker click', marker, event);
+            self.showInfoWindowForMarker_(marker);
         });
         // Two event listeners - one for mouseover, one for mouseout,
         // to change the colors back and forth.
         marker.addListener('mouseover', (function(icon) {
             return function() {
-                this.setIcon(icon);
+                marker.setIcon(icon);
             };
         })(params.highlightedIcon));
         marker.addListener('mouseout', (function(icon) {
             return function() {
-                this.setIcon(icon);
+                marker.setIcon(icon);
             };
         })(params.icon));
 
@@ -121,7 +112,9 @@ function MapHandler() {
     };
 
     // Animate marker for tree for 3 seconds
-    self.animateMarker = function (tree) {
+    self.signalMarkerWithInfoWindow = function (tree) {
+        self.largeInfowindow.close();
+        
         var marker = self.markers[tree.index];
         google.maps.event.trigger(map, "resize");
         self.map.setZoom(18);
@@ -130,6 +123,7 @@ function MapHandler() {
         // It takes the map a moment to zoom in and pan, so
         // the animation is started after a short delay:
         setTimeout(function() {
+            self.showInfoWindowForMarker_(marker);
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
                 marker.setAnimation(null);
@@ -225,6 +219,18 @@ function MapHandler() {
         }
     };
 
+    self.showInfoWindowForMarker_ = function (marker) {
+        //console.log('http://maps.google.com/maps?q=loc:'+marker.position.lat()+','+marker.position.lng());
+        var article = new WikipediaPage();
+        article.load(marker.latin_name, function(page, successFlag, errorMessage) {
+            if (successFlag) {
+                self.populateInfoWindow(marker, self.largeInfowindow, page);
+            } else {
+                self.populateInfoWindow(marker, self.largeInfowindow, errorMessage);
+            }
+        });
+    };
+
     // Sets the map on all markers in the tree.
     self.setMapForAllMarkers_ = function(map) {
         for (var property in self.markers) {
@@ -277,7 +283,12 @@ function MapHandler() {
         self.clearMarkers_();
         self.setMapOnForMarkers_(trees);
         self.showMarkerCluster_();
-        //self.map.fitBounds(self.mapBounds);
+        if (trees.length>0) {
+            self.map.fitBounds(self.mapBounds);
+        } else {
+            // If there's no tree found, zoom to district boundaries
+            self.map.fitBounds(self.currentDistrictBounds);            
+        }
     };
 
     // Deletes all markers in the array by removing references to them.
@@ -287,6 +298,4 @@ function MapHandler() {
         // reset the cache for the marker icons
         self.markerIconCache = {};
     };
-
-
 }

@@ -85,7 +85,7 @@ zoom factor.
 }
 
 .sidebar-list {
-    height: calc(100% - 220px);
+    height: calc(100% - 230px);
     background-color: white;
     overflow-y: scroll;
 }

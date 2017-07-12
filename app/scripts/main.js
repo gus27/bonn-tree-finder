@@ -43,6 +43,13 @@ function MainViewModel(mapHandler) {
     self.visibleTrees = ko.observableArray(); //.extend({ rateLimit: 50 });
     self.treeTypes = ko.observableArray(); //.extend({ rateLimit: 50 });
     self.treeAges = ko.observableArray(['< 50', '50 - 99', '100 - 149', '150 - 199', '>= 200']);
+    self.visibleTreesFound = ko.computed(function() {
+        if (self.visibleTrees().length > 1)
+            return self.visibleTrees().length+' trees found';
+        if (self.visibleTrees().length == 1)
+            return '1 tree found';
+        return 'No tree found';
+    });
 
     //self.trees = [];
     self.db = new loki('example.db');
@@ -62,7 +69,7 @@ function MainViewModel(mapHandler) {
     
     self.listClicked = function(element, event) {
         console.log('listClicked', element, event);        
-        self.mapHandler.animateMarker(element);
+        self.mapHandler.signalMarkerWithInfoWindow(element);
     };
 
     self.filterTrees = function(params) {
@@ -104,7 +111,7 @@ function MainViewModel(mapHandler) {
             filters.push({ 'facility': { '$regex': [params.streetName, 'i'] }});
         }
         
-        result = self.dbTrees.find({ '$and': filters });
+        result = self.dbTrees.chain().find({ '$and': filters }).compoundsort(['facility','id']).data();
         self.mapHandler.showMarkers(result);
         self.visibleTrees(result);
     };
