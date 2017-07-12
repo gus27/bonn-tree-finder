@@ -63,8 +63,7 @@ function MainViewModel(mapHandler) {
 
     self.toggleSidebar = function() {
         self.shouldShowSidebar(!self.shouldShowSidebar());
-        // TODO: does not seem to work correctly. Switch to sidebar as overlay.
-        self.mapHandler.checkResize();
+        setTimeout(self.mapHandler.checkResize, 500);
     };
     
     self.listClicked = function(element, event) {
