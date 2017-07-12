@@ -16,3 +16,5 @@ https://getbootstrap.com/
 https://startbootstrap.com/template-overviews/simple-sidebar/
 FontAwesome
 http://jsfiddle.net/adrienne/Y2WUN/ (Lazy loading list with KnockoutJS/Infinite scroll)
+https://discussions.udacity.com/t/knockout-binding-from-infowindow/189235/12 (InfoWindow with Knockout)
+http://jsfiddle.net/SittingFox/nr8tr5oo/ (InfoWindow with Knockout)
