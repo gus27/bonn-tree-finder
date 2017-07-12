@@ -12,6 +12,7 @@ function MapHandler() {
     self.visibleMarkers = [];
     // Cache for already created icons
     self.markerIconCache = {};
+    self.largeInfowindow = new google.maps.InfoWindow({width:500,maxWidth:500});
 
     // Create a styles array to use with the map.
     // Make the green areas look light-brown to avoid
@@ -56,9 +57,16 @@ function MapHandler() {
 
         // Create an onclick event to open the large infowindow at each marker.
         marker.addListener('click', function(event) {
-            //console.log('marker click', this, event);
+            console.log('marker click', this, event);
             console.log('http://maps.google.com/maps?q=loc:'+this.position.lat()+','+this.position.lng());
-            self.populateInfoWindow(this, largeInfowindow);
+            var article = new WikipediaPage();
+            article.load(this.latin_name, function(page, successFlag, errorMessage) {
+                if (successFlag) {
+                    self.populateInfoWindow(marker, self.largeInfowindow, page);
+                } else {
+                    self.populateInfoWindow(marker, self.largeInfowindow, errorMessage);
+                }
+            });
         });
         // Two event listeners - one for mouseover, one for mouseout,
         // to change the colors back and forth.
@@ -101,6 +109,7 @@ function MapHandler() {
 
             self.addMarker_({
                 index: tree.index,
+                latin_name: tree.latin_name,
                 position: tree.position,
                 title: title,
                 //animation: google.maps.Animation.DROP,
@@ -186,6 +195,34 @@ function MapHandler() {
         );
         self.markerIconCache[prop] = markerImage;
         return markerImage;
+    };
+
+    // This function populates the infowindow when the marker is clicked. We'll only allow
+    // one infowindow which will open at the marker that is clicked, and populate based
+    // on that markers position.
+    self.populateInfoWindow = function (marker, infowindow, data) {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            infowindow.marker = marker;
+            
+            if (typeof data === 'object') {
+                var page = data;
+                var image = '<img src="%%PAGEIMGURL%%" style="float:right;margin-left:10px;">';
+                var content = '<div>%%IMG%% %%PAGEEXTRACT%%</div><div>Source: <a href="%%PAGEURL%%" target="_blank">Wikipedia</a></div>';
+                content = content.replace('%%IMG%%', page.pageImageUrl ? image.replace('%%PAGEIMGURL%%', page.pageImageUrl) : '');
+                content = content.replace('%%PAGEEXTRACT%%', page.pageExtract);
+                content = content.replace('%%PAGEURL%%', page.pageUrl);
+            } else {
+                content = '<div>'+data+'</div>';
+            }
+            
+            infowindow.setContent(content);
+            infowindow.open(map, marker);
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function () {
+                infowindow.marker = null;
+            });
+        }
     };
 
     // Sets the map on all markers in the tree.
