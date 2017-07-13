@@ -33,6 +33,7 @@ function MainViewModel(mapHandler) {
 
     self.mapHandler = mapHandler;
     self.initialized = ko.observable(false);
+    self.windowWidth = ko.observable($(window).width());
     self.shouldShowSidebar = ko.observable(true);
     self.selectedDistrict = ko.observable();
     self.selectedTreeType = ko.observable();
@@ -57,8 +58,7 @@ function MainViewModel(mapHandler) {
 
     $(window).on('resize', function() {
         var win = $(window);
-        /* If there is enough space (> 600px), we open the sidebar. */
-        self.shouldShowSidebar(win.width() > 600);
+        self.windowWidth(win.width());
     });
 
     self.toggleSidebar = function() {

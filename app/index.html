@@ -24,7 +24,7 @@
 
 </head>
 <body>
-    <div id="wrapper" data-bind="css: { toggled: shouldShowSidebar() }">
+    <div id="wrapper" data-bind="css: { toggled: shouldShowSidebar() || windowWidth()>800 }">
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
@@ -67,14 +67,13 @@
                 <hr/>
                 </div>
             </lazy-tree-list>
-        </div>
-        
+        </div>        
         <!-- /#sidebar-wrapper -->
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-            <nav class="my-navbar">
-                <div class="my-navbar-header">
+            <nav class="top-navbar">
+                <div class="top-navbar-header">
                     <button type="button" class="btn btn-default" id="sidebar-toggle" data-bind="click: toggleSidebar">
                         <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
                     </button>

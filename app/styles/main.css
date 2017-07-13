@@ -17,17 +17,11 @@ body {
     transition: all 0.5s ease;
 }
 
-#wrapper.toggled {
-    padding-left: 250px;
-}
-
 #sidebar-wrapper {
-    z-index: 0;
     position: fixed;
-    left: 250px;
-    width: 0;
+    left: -250px;
+    width: 250px;
     height: 100%;
-    margin-left: -250px;
     overflow-y: auto;
     background: #474f87;
     -webkit-transition: all 0.5s ease;
@@ -35,10 +29,19 @@ body {
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
     overflow-x: hidden;
+    z-index: 1;
+    
+    -webkit-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
+    box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);    
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    width: 250px;
+    left: 0;
+}
+
+#wrapper.toggled .top-navbar {
+    padding-left: 250px;
 }
 
 #page-content-wrapper {
@@ -46,32 +49,27 @@ body {
     height: 100%;
     position: absolute;
     padding: 0px;
-    -webkit-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
-    box-shadow: -2px 0px 15px 0px rgba(0,0,0,0.75);
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;    
-    z-index: 1;
+    z-index: 0;
 }
 
-/* 
-If the width is greater than 600px the map area will shrink
-when the sidebar is visible. 
-When the width is smaller than 600px the map will not shrink 
-any more but moved off screen. Otherwise on small screens the
-Google Maps fitBounds function will calculate a very small 
-zoom factor.
-*/
-@media (min-width: 600px) {
-    #wrapper.toggled #page-content-wrapper {
-        width: calc(100% - 250px);
+@media (min-width: 800px) {
+    #wrapper.toggled {
+        padding-left: 250px;
+    }
+    #wrapper.toggled .top-navbar {
+        padding-left: 0;
+    }
+    /* Hide hamburger button */
+    #sidebar-toggle {
+        display: none;
     }
 }
 
 .sidebar-nav {
-    /*position: absolute;*/
     top: 0;
     width: 250px;
     height: 210px;
@@ -102,15 +100,18 @@ zoom factor.
     width: 100%;
 }
 
-/* TODO: my-navbar umbenennen */
-.my-navbar {
+.top-navbar {
     position: fixed;
     height: 50px;
     top: 0;
     border-width: 0 0 1px;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;        
 }
 
-.my-navbar button {
+.top-navbar button {
     float: left;
     margin: 5px;
     width: 40px;
@@ -119,7 +120,7 @@ zoom factor.
     font-size: 2em;
 }
 
-.my-navbar button:focus {
+.top-navbar button:focus {
     outline-style: none;
 }
 
