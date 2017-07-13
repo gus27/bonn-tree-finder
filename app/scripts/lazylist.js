@@ -1,3 +1,14 @@
+/**
+ * @name lazy-tree-list for KnockoutJS
+ * @version version 1.0
+ * @author Guido Schoepp
+ * @fileoverview
+ * This Knockout component implements a list which content
+ * will be shown only when requested - for large amount of rows.
+ * It first shows 20 entries and when scrolled to the end
+ * of the list it displays the next 20 entries.
+ */
+
 // Lazy list inspiration from http://jsfiddle.net/adrienne/Y2WUN/
 
 var lazyTreeListId = 1;
