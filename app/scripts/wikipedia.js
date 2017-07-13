@@ -14,7 +14,6 @@ function WikipediaPage() {
         var queryImgUrl = WikipediaImgQueryUrl+encodeURIComponent(imageFilename);
         $.getJSON(queryImgUrl)
         .done(function(result) {
-            console.log('queryImage_', result);
             if (result.query.pages) {
                 for (var pageNo in result.query.pages) {
                     var page = result.query.pages[pageNo];
@@ -43,7 +42,6 @@ function WikipediaPage() {
             if (result.query.pages) {
                 for (var pageNo in result.query.pages) {
                     if (result.query.pages.hasOwnProperty(pageNo)) {
-                        console.log(result);
                         var page = result.query.pages[pageNo];
                         self.pageImage = page.pageprops.page_image_free;
                         self.pageExtract = page.extract;
@@ -65,15 +63,12 @@ function WikipediaPage() {
     };
 
     self.search_ = function (searchTerm, callback) {
-        console.log('search_', searchTerm);
         var searchUrl = WikipediaSearchUrl+encodeURIComponent(searchTerm);
 
         $.getJSON(searchUrl)
         .done(function(result) {
-            console.log(result);
             var pageName = result[1][0];
             self.pageUrl = result[3][0];
-            console.log('name', pageName, 'url', self.pageUrl);
             if (pageName && self.pageUrl) {
                 self.queryInfo_(pageName, callback);
             } else {

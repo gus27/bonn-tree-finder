@@ -29,12 +29,12 @@ function Tree(index, id, name, latin_name, facility, age, position) {
 function MainViewModel(mapHandler) {
     var self = this;
 
-    self.nameFieldname = 'german_name'; // latin_name
+    self.nameFieldname = 'german_name';
 
     self.mapHandler = mapHandler;
     self.initialized = ko.observable(false);
     self.windowWidth = ko.observable($(window).width());
-    self.shouldShowSidebar = ko.observable(true);
+    self.shouldShowSidebar = ko.observable(false);
     self.selectedDistrict = ko.observable();
     self.selectedTreeType = ko.observable();
     self.selectedTreeAge = ko.observable();
@@ -63,11 +63,11 @@ function MainViewModel(mapHandler) {
 
     self.toggleSidebar = function() {
         self.shouldShowSidebar(!self.shouldShowSidebar());
-        setTimeout(self.mapHandler.checkResize, 500);
+        // resize after the css animation is finished
+        setTimeout(self.mapHandler.checkResize, 1000);
     };
     
     self.listClicked = function(element, event) {
-        console.log('listClicked', element, event);        
         self.mapHandler.signalMarkerWithInfoWindow(element);
     };
 
@@ -116,7 +116,6 @@ function MainViewModel(mapHandler) {
     };
 
     self.loadDistricts = function() {
-        console.log('loadDistricts');
         $.getJSON('./data/districts.json')
         .done(function(result) {
             self.districts.removeAll();
@@ -139,12 +138,10 @@ function MainViewModel(mapHandler) {
     };
 
     self.loadTrees = function() {
-        console.log('_loadTrees');
         if (!self.selectedDistrict() || !self.selectedDistrict().filename)
             return;
         $.getJSON('./data/'+self.selectedDistrict().filename)
         .done(function(result) {
-            console.log('loadTrees - data loaded');
             self.selectedDistrict().setCoordinates(result.coordinates);
             self.treeTypes.removeAll();
             self.dbTrees.removeDataOnly();
@@ -170,8 +167,6 @@ function MainViewModel(mapHandler) {
                 self.dbTrees.find()
             );
             self.initialized(true);            
-            
-            console.log('loadTrees - end');
         })
         .fail(function(err) {
             // TODO: show error message to user
@@ -183,7 +178,6 @@ function MainViewModel(mapHandler) {
     ko.computed(function() {
         if (!self.initialized())
             return;
-        console.log('computed age/treetype ');
         self.filterTrees({ 
             treeType: self.selectedTreeType(), 
             treeAge: self.selectedTreeAge(),
@@ -202,7 +196,7 @@ function MainViewModel(mapHandler) {
         }
     }).extend({ deferred: true, rateLimit: 100 });    
     
-    self.loadDistricts();
+    setTimeout(self.loadDistricts, 300);
 }
 
 
@@ -210,9 +204,6 @@ function initMap() {
     var mapHandler = new MapHandler();
     mapHandler.init('map');
 
-    //ko.options.deferUpdates = true;
     var mainViewModel = new MainViewModel(mapHandler);
     ko.applyBindings(mainViewModel);
-
-    //myViewModel.setMapHandler(mapHandler);
 }

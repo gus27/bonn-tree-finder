@@ -56,7 +56,6 @@ function MapHandler() {
 
         // Create an onclick event to open the large infowindow at each marker.
         marker.addListener('click', function(event) {
-            console.log('marker click', marker, event);
             self.showInfoWindowForMarker_(marker);
         });
         // Two event listeners - one for mouseover, one for mouseout,
@@ -114,9 +113,9 @@ function MapHandler() {
     // Animate marker for tree for 3 seconds
     self.signalMarkerWithInfoWindow = function (tree) {
         self.largeInfowindow.close();
-        
+
         var marker = self.markers[tree.index];
-        google.maps.event.trigger(map, "resize");
+        self.checkResize();
         self.map.setZoom(18);
         self.map.panTo(marker.getPosition());
 
@@ -198,7 +197,7 @@ function MapHandler() {
         // Check to make sure the infowindow is not already opened on this marker.
         if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            
+
             if (typeof data === 'object') {
                 var page = data;
                 var image = '<img src="%%PAGEIMGURL%%" style="float:right;margin-left:10px;">';
@@ -209,9 +208,9 @@ function MapHandler() {
             } else {
                 content = '<div>'+data+'</div>';
             }
-            
+
             infowindow.setContent(content);
-            infowindow.open(map, marker);
+            infowindow.open(self.map, marker);
             // Make sure the marker property is cleared if the infowindow is closed.
             infowindow.addListener('closeclick', function () {
                 infowindow.marker = null;
@@ -220,7 +219,6 @@ function MapHandler() {
     };
 
     self.showInfoWindowForMarker_ = function (marker) {
-        //console.log('http://maps.google.com/maps?q=loc:'+marker.position.lat()+','+marker.position.lng());
         var article = new WikipediaPage();
         article.load(marker.latin_name, function(page, successFlag, errorMessage) {
             if (successFlag) {
@@ -269,26 +267,30 @@ function MapHandler() {
         self.markerClusterer.clearMarkers();
     };
 
+    self.showMarkers_ = function(trees) {
+        if (trees) {
+            self.clearMarkers_();
+            self.setMapOnForMarkers_(trees);
+        } else {
+            self.setMapForAllMarkers_(self.map);
+        }
+        self.showMarkerCluster_();
+        if (trees !== undefined && trees.length > 0) {
+            self.map.fitBounds(self.mapBounds);
+        } else {
+            // If there's no tree, zoom to district boundaries
+            self.map.fitBounds(self.currentDistrictBounds);
+        }
+    };
+
     // Shows all markers.
     self.showAllMarkers = function() {
-        console.log('showAllMarkers');
-        self.setMapForAllMarkers_(self.map);
-        self.showMarkerCluster_();
-        //self.map.fitBounds(self.mapBounds);
+        self.showMarkers_();
     };
 
     // Shows markers in the trees array.
     self.showMarkers = function(trees) {
-        console.log('showMarkers '+trees.length);
-        self.clearMarkers_();
-        self.setMapOnForMarkers_(trees);
-        self.showMarkerCluster_();
-        if (trees.length>0) {
-            self.map.fitBounds(self.mapBounds);
-        } else {
-            // If there's no tree found, zoom to district boundaries
-            self.map.fitBounds(self.currentDistrictBounds);            
-        }
+        self.showMarkers_(trees);
     };
 
     // Deletes all markers in the array by removing references to them.
