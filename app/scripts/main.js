@@ -1,19 +1,63 @@
-// Model class for a district
+/**
+ * @name Model and ModelView classes using the Knockout JS framework
+ * @version version 1.0
+ * @author Guido Schoepp
+ * @fileoverview
+ * Provides functions for initializing, showing markers
+ * (including clustering) and info windows.
+ * Credits:
+ * - for markers functions see https://developers.google.com/maps/documentation/javascript/examples/marker-remove?hl=de
+ * - updating markercluster after removing markers from array see https://stackoverflow.com/a/24383013/4571082
+ */
+
+/**
+ * @description Model class for a district. Represents a district with it's name 
+ *      and bounding coordinates.
+ * @param {string} name - The district's name
+ * @param {string} filename - The name of the JSON file containing the trees for this district
+ * @param {number} countTrees - The number of trees in this district
+ * @param {array=} coordinates - The bounding coordinates of this district as an array of 
+ *      lat/lng coordinates, eg. [{"lat": 50.7590564324, "lng": 7.0628029591}, ...]
+ * @constructor
+ */
 function District(name, filename, countTrees, coordinates) {
     var self = this;
     self.name = name || '';
     self.filename = filename || '';
     self.countTrees = countTrees || '0';
     self.coordinates = coordinates || [];
+    /**
+     * @description Get display text for this district
+     *
+     * @returns {string} The text to display
+     */
     self.displayText = function() {
         return self.name + ' (' + self.countTrees + ')';
     };
+    /**
+     * @description Set bounding coordinates (polygon)
+     *
+     * @param {array} coordinates - The bounding coordinates of this district as an array of 
+     *      lat/lng coordinates, eg. [{"lat": 50.7590564324, "lng": 7.0628029591}, ...]
+     */
     self.setCoordinates = function(coordinates) {
         self.coordinates = coordinates;
     };
 }
 
-// Model class for a tree
+/**
+ * @description Model class for a tree. Represents a tree with it's names 
+ *      street, age and position.
+ * @param {number} index - The district's name
+ * @param {number} id - The district's name
+ * @param {string} name - The name to display for the tree, usually the latin_name here
+ * @param {string} latin_name - The latin name of the tree
+ * @param {string} facility - The name of the location of the tree, usually the street name
+ * @param {number} age - The age of the tree
+ * @param {object} position - The coordinates of this tree as an object of 
+ *      lat/lng values, eg. {"lat": 50.7590564324, "lng": 7.0628029591}
+ * @constructor
+ */
 function Tree(index, id, name, latin_name, facility, age, position) {
     var self = this;
     self.index = parseInt(index || '0');
@@ -22,27 +66,51 @@ function Tree(index, id, name, latin_name, facility, age, position) {
     self.latin_name = latin_name || '';
     self.age = parseInt(age || '0');
     self.facility = facility || '';
-    self.position = position || [];
+    self.position = position || {};
 }
 
-// ViewModel class
+/**
+ * @description The main view model for this app. A KnockoutJS compliant ViewModel class.
+ * @param {object} mapHandler - An instance of the MapHandler class
+ * @constructor
+ */
 function MainViewModel(mapHandler) {
     var self = this;
 
-    self.nameFieldname = 'german_name';
+    /**
+     * @description The name to display in the tree type select input and in the tooltip of the marker.
+     *      By default this is set to 'latin_name'. Can be changed to 'german_name'.
+     *
+     * @type {string}
+     * @private
+     */
+    self.nameFieldname = 'latin_name';
 
     self.mapHandler = mapHandler;
     self.initialized = ko.observable(false);
+    /**
+     * @description Represents the width of the browser window. 
+     *      Used for displaying the sidebar.
+     *
+     * @type {observable}
+     * @private
+     */    
     self.windowWidth = ko.observable($(window).width());
+    /**
+     * @description Represents the user influenced flag for showing the sidebar.
+     *
+     * @type {observable}
+     * @private
+     */    
     self.shouldShowSidebar = ko.observable(false);
     self.selectedDistrict = ko.observable();
     self.selectedTreeType = ko.observable();
     self.selectedTreeAge = ko.observable();
     self.inputStreetName = ko.observable();
 
-    self.districts = ko.observableArray(); //.extend({ rateLimit: 50 });
-    self.visibleTrees = ko.observableArray(); //.extend({ rateLimit: 50 });
-    self.treeTypes = ko.observableArray(); //.extend({ rateLimit: 50 });
+    self.districts = ko.observableArray(); 
+    self.visibleTrees = ko.observableArray();
+    self.treeTypes = ko.observableArray(); 
     self.treeAges = ko.observableArray(['< 50', '50 - 99', '100 - 149', '150 - 199', '>= 200']);
     self.visibleTreesFound = ko.computed(function() {
         if (self.visibleTrees().length > 1)

@@ -3,6 +3,9 @@ Things done for faster rendering:
 - use MarkerClusterer 
 - use a lazy list component which renders max. 20 entries at first. Only when scrolling to the last element the next 20 elements are displayed.
 
+Unfortunately the open data file only contains no english name of the tree - only the latin and a german name. 
+To keep this as international as possible the latin names are used throughout this app and the english 
+Wikipedia entries will be displayed.
 
 I used an KO observable to show and hide the sidebar. This observable
 is triggered by the button with the hamburger icon and by the 
@@ -16,5 +19,3 @@ https://getbootstrap.com/
 https://startbootstrap.com/template-overviews/simple-sidebar/
 FontAwesome
 http://jsfiddle.net/adrienne/Y2WUN/ (Lazy loading list with KnockoutJS/Infinite scroll)
-https://discussions.udacity.com/t/knockout-binding-from-infowindow/189235/12 (InfoWindow with Knockout)
-http://jsfiddle.net/SittingFox/nr8tr5oo/ (InfoWindow with Knockout)
