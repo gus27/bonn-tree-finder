@@ -114,6 +114,10 @@ function MapHandler() {
         // Create an onclick event to open the large infowindow at each marker.
         marker.addListener('click', function(event) {
             self.showInfoWindowForMarker_(marker);
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+                marker.setAnimation(null);
+            }, 1200);
         });
         // Two event listeners - one for mouseover, one for mouseout,
         // to change the colors back and forth.
