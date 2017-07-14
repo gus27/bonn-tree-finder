@@ -5,7 +5,6 @@ import sys
 import urllib.request
 import json
 import re
-#from pyproj import Proj, transform
 from shapely.geometry import mapping, shape, asShape, Point
 from rtree import index
 
@@ -119,7 +118,7 @@ def optimizeForJson(districts):
     for name, district in districts.items():
         # remove shape and coordinates from district - it is not needed in the resulting JSON
         del district['shape']
-        
+
 def getDistrictSummary(districts):
     summary = {'totalCount': len(districts), 'districts': []}
     for name, district in districts.items():

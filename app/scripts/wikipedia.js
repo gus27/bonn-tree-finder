@@ -13,7 +13,7 @@
  * @type {string}
  * @private
  */
-var WIKIPEDIA_BASE_URL_ = "https://en.wikipedia.org/w/api.php?";
+var WIKIPEDIA_BASE_URL_ = 'https://en.wikipedia.org/w/api.php?';
 
 /**
  * @description URL for searching a Wikipedia page
@@ -21,7 +21,7 @@ var WIKIPEDIA_BASE_URL_ = "https://en.wikipedia.org/w/api.php?";
  * @type {string}
  * @private
  */
-var WIKIPEDIA_SEARCH_URL_ = WIKIPEDIA_BASE_URL_+"action=opensearch&format=json&uselang=de&namespace=0&redirects=resolve&origin=*&search=";
+var WIKIPEDIA_SEARCH_URL_ = WIKIPEDIA_BASE_URL_+'action=opensearch&format=json&uselang=de&namespace=0&redirects=resolve&origin=*&search=';
 
 /**
  * @description URL for querying information about a Wikipedia page
@@ -29,7 +29,7 @@ var WIKIPEDIA_SEARCH_URL_ = WIKIPEDIA_BASE_URL_+"action=opensearch&format=json&u
  * @type {string}
  * @private
  */
-var WIKIPEDIA_QUERY_URL_ = WIKIPEDIA_BASE_URL_+"action=query&format=json&prop=info%7Cpageprops%7Cextracts&exintro=1&origin=*&titles=";
+var WIKIPEDIA_QUERY_URL_ = WIKIPEDIA_BASE_URL_+'action=query&format=json&prop=info%7Cpageprops%7Cextracts&exintro=1&origin=*&titles=';
 
 /**
  * @description URL for requesting the image (thumbnail) URL for a given filename
@@ -37,7 +37,7 @@ var WIKIPEDIA_QUERY_URL_ = WIKIPEDIA_BASE_URL_+"action=query&format=json&prop=in
  * @type {string}
  * @private
  */
-var WIKIPEDIA_IMG_QUERY_URL_ = WIKIPEDIA_BASE_URL_+"action=query&format=json&prop=imageinfo&iilimit=50&iiurlwidth=200&iiprop=timestamp|user|url&origin=*&titles=File:";
+var WIKIPEDIA_IMG_QUERY_URL_ = WIKIPEDIA_BASE_URL_+'action=query&format=json&prop=imageinfo&iilimit=50&iiurlwidth=200&iiprop=timestamp|user|url&origin=*&titles=File:';
 
 /**
  * @description Represents a Wikipedia page
@@ -75,9 +75,8 @@ function WikipediaPage() {
             }
         })
         .fail(function (err) {
-            // TODO: show error message to user
-            console.log('Wikipedia image query - data cannot be loaded '+err);
-            callback(self, false, err);
+            console.log('Wikipedia image query - data cannot be loaded ', err);
+            callback(self, false, 'Data from Wikipedia image query cannot be loaded');
         });
     };
 
@@ -110,9 +109,8 @@ function WikipediaPage() {
             }
         })
         .fail(function (err) {
-            // TODO: show error message to user
             console.log('Wikipedia query - data cannot be loaded '+err);
-            callback(self, false, err);
+            callback(self, false, 'Data from Wikipedia query cannot be loaded');
         });
     };
 
@@ -133,8 +131,8 @@ function WikipediaPage() {
             if (pageName && self.pageUrl) {
                 self.queryInfo_(pageName, callback);
             } else {
-                if (searchTerm.indexOf("(") > 0 || searchTerm.indexOf("'") > 0) {
-                    searchTerm = searchTerm.replace(/\s*[('].*/, "");
+                if (searchTerm.indexOf('(') > 0 || searchTerm.indexOf('\'') > 0) {
+                    searchTerm = searchTerm.replace(/\s*[('].*/, '');
                     self.search_(searchTerm, callback);
                 } else {
                     callback(self, false, 'Wikipedia page for "' + searchTerm + '" not found');
@@ -142,9 +140,8 @@ function WikipediaPage() {
             }
         })
         .fail(function (err) {
-            // TODO: show error message to user
-            console.log('Wikipedia search - data cannot be loaded '+err);
-            callback(self, false, err);
+            console.log('Wikipedia search - data cannot be loaded ', err);
+            callback(self, false, 'Data from Wikipedia search cannot be loaded');
         });
     };
 

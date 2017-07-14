@@ -321,6 +321,7 @@ function MapHandler() {
             if (successFlag) {
                 self.populateInfoWindow_(marker, self.largeInfowindow, page);
             } else {
+                console.log('showInfoWindowForMarker_', page, successFlag, errorMessage);
                 self.populateInfoWindow_(marker, self.largeInfowindow, errorMessage);
             }
         });

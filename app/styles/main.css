@@ -96,6 +96,16 @@ body {
     overflow-y: scroll;
 }
 
+.sidebar-footer {
+    font-size: 10px;
+    color: white;
+    padding: 0 10px;
+}
+
+.sidebar-footer  a:link, .sidebar-footer a:visited {
+    color: #A9E2F3;
+}
+
 .map-wrapper {
     margin: 50px 0 0 0;
     padding: 0;
