@@ -31,4 +31,4 @@ ko.bindingHandlers.modal = {
             $(element).modal('hide');
         }
     }
-}
+};
