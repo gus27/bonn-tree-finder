@@ -4,17 +4,14 @@
     <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bonn Treefinder</title>
+    <title>Bonn Tree Finder</title>
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
 
-    <!-- TODO: Remove Font Awesome -->
-
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -24,7 +21,7 @@
 
 </head>
 <body>
-    <div id="wrapper" data-bind="css: { toggled: shouldShowSidebar() || windowWidth()>800 }">
+    <div id="wrapper" data-bind="css: { toggled: showSidebar() || windowWidth()>800 }">
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
@@ -65,14 +62,17 @@
                      </div>
                     <div>
                         <span class="fieldname">street</span><span data-bind="text: facility"></span>
-                    </div>                    
+                    </div>
                     <div>
                         <span class="fieldname">age</span><span data-bind="text: age"></span> years
                         <span class="fieldname">id</span><span data-bind="text: id"></span>
                     </div>
                 </div>
             </lazy-tree-list>
-        </div>        
+            <div class="sidebar-footer">
+                Tree data provided by <a href="https://opendata.bonn.de/" target="_blank">Offene Daten:Bonn</a>
+            </div>
+        </div>
         <!-- /#sidebar-wrapper -->
 
         <!-- Page Content -->
@@ -82,7 +82,7 @@
                     <button type="button" class="btn btn-default" id="sidebar-toggle" data-bind="click: toggleSidebar">
                         <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
                     </button>
-                    <span class="navbar-brand">Bonn Treefinder</span>
+                    <span class="navbar-brand">Bonn Tree Finder</span>
                 </div>
             </nav>
             <div class="map-wrapper">
@@ -93,6 +93,25 @@
 
     </div>
     <!-- /#wrapper -->
+
+    <!-- Modal Dialog -->
+    <div id="modalError" class="modal fade" role="dialog" data-bind="modal: showErrorDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">An error occurred</h4>
+                </div>
+                <div class="modal-body">
+                    <p data-bind="text: errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#myModal -->
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -119,8 +138,9 @@
 
     <!-- build:js scripts/main.js -->
     <script src="scripts/markerclusterer.js"></script>
+    <script src="scripts/ko-lazylist.js"></script>
+    <script src="scripts/ko-binding-modal.js"></script>
     <script src="scripts/wikipedia.js"></script>
-    <script src="scripts/lazylist.js"></script>
     <script src="scripts/maphandler.js"></script>
     <script src="scripts/main.js"></script>
     <!-- endbuild -->
