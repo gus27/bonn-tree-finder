@@ -5,9 +5,12 @@ _A Udacity FEND Project (Neighborhood Map)_
 In the city of Bonn (the former german capital) you find a lot of trees. This app helps you to identify what kind of trees surround you in your neighborhood.
 
 ## Installation
-After downloading or cloning the repository you can either 
-* open the html page `dist/index.html` in your browser
-* or build the project by starting `npm install` and `bower install` and launch an internal web server with `gulp serve`. See here for how to install [npm](https://www.npmjs.com/get-npm) and [bower](https://www.npmjs.com/package/bower). 
+
+You can view it [live here](https://gus27.github.io/bonn-treefinder/index.html).
+
+If you want to download or clone the repository you can either 
+* place the contents of the `dist` directory in a web server of your choice and open http://my.web.srv/dist/index.html in your browser
+* or build the project by starting `npm install`, `bower install` and launch an internal web server with `gulp serve`. See here for how to install [npm](https://www.npmjs.com/get-npm) and [bower](https://www.npmjs.com/package/bower). 
 
 ## Usage
 * Select your favoured district.
