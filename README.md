@@ -33,7 +33,7 @@ If you want to download or clone the repository you can either
 ## Challenges
 
 * The first challenge was the size of the tree data JSON file which is [around 27 MB](http://stadtplan.bonn.de/geojson?Thema=21367&koordsys=4326) big. This would take too much time when loaded by an AJAX request. So I wrote a python script to split the data: one JSON file per district. The districts polygons can be found [here](http://stadtplan.bonn.de/geojson?Thema=21247&koordsys=4326). I used [shapely.geometry](https://pypi.python.org/pypi/Shapely) to determine which tree belongs to which district. Python's [rtree module](https://pypi.python.org/pypi/Rtree/) speeds up the process.
-* Rendering the markers for more than 64,000 trees was the next problem because it slows down the browser. I decided to force the user to choose a district so that max. 4,500 markers have to be rendered. But even this amount of markers takes much time during the the map generation. Thanks to Google's [MarkerClusterer](https://github.com/googlemaps/js-marker-clusterer) the markers can be clustered. With the smaller numbers of clusters the map will render fast.
+* Rendering the markers for more than 64,000 trees was the next problem because it slows down the browser. I decided to force the user to choose a district so that max. 4,500 markers have to be rendered. But even this amount of markers takes much time during the map generation. Thanks to Google's [MarkerClusterer](https://github.com/googlemaps/js-marker-clusterer) the markers can be clustered. With the smaller numbers of clusters the map will render fast.
 * Inserting DOM elements for around 4,500 list elements is another ambitious task for a browser. To circumvent this I implemented a lazy list component (inspired by [adrienne](http://jsfiddle.net/adrienne/Y2WUN/)). This displays 20 entries at first. Only when scrolling to the last element the next 20 elements are displayed.
 
 
@@ -42,4 +42,4 @@ Unfortunately the source file for the trees contains no english names - only the
 
 ## Credits
 All trees the city of Bonn owns are provided by the open data portal [Offene Daten:Bonn](https://opendata.bonn.de/).
-The informations for a tree are retrieved by [Wikipedia](http://en.wikipedia.org).
+The informations for a tree are retrieved from [Wikipedia](http://en.wikipedia.org).
