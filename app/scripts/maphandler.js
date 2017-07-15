@@ -117,7 +117,7 @@ function MapHandler() {
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
                 marker.setAnimation(null);
-            }, 1200);
+            }, 1400);
         });
         // Two event listeners - one for mouseover, one for mouseout,
         // to change the colors back and forth.
@@ -193,7 +193,7 @@ function MapHandler() {
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
                 marker.setAnimation(null);
-            }, 3000);
+            }, 2800);
         }, 500);
     };
 
