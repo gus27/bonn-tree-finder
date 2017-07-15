@@ -24,7 +24,7 @@
     <div id="wrapper" data-bind="css: { toggled: showSidebar() || windowWidth()>800 }">
 
         <!-- Sidebar -->
-        <div id="sidebar-wrapper">
+        <aside id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li>
                     Filter trees:
@@ -72,11 +72,11 @@
             <div class="sidebar-footer">
                 Tree data provided by <a href="https://opendata.bonn.de/" target="_blank">Offene Daten:Bonn</a>
             </div>
-        </div>
+        </aside>
         <!-- /#sidebar-wrapper -->
 
         <!-- Page Content -->
-        <div id="page-content-wrapper">
+        <main id="page-content-wrapper">
             <nav class="top-navbar">
                 <div class="top-navbar-header">
                     <button type="button" class="btn btn-default" id="sidebar-toggle" data-bind="click: toggleSidebar">
@@ -85,17 +85,17 @@
                     <span class="navbar-brand">Bonn Tree Finder</span>
                 </div>
             </nav>
-            <div class="map-wrapper">
+            <section class="map-wrapper">
                 <div id="map"></div>
-            </div>
-        </div>
+            </section>
+        </main>
         <!-- /#page-content-wrapper -->
 
     </div>
     <!-- /#wrapper -->
 
     <!-- Modal Dialog -->
-    <div id="modalError" class="modal fade" role="dialog" data-bind="modal: showErrorDialog">
+    <aside id="modalError" class="modal fade" role="dialog" data-bind="modal: showErrorDialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -103,15 +103,15 @@
                     <h4 class="modal-title">An error occurred</h4>
                 </div>
                 <div class="modal-body">
-                    <p data-bind="text: errorMessage"></p>
+                    <p data-bind="text: errorMessage" id="errorMessage"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- /#myModal -->
+    </aside>
+    <!-- /#modalError -->
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -146,7 +146,7 @@
     <!-- endbuild -->
     <script async defer
         src=
-        "https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyDVR5xzIRtzheHVpj1Xyh63SFz8uXOZKYw&v=3&callback=initMap">
+        "https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyDVR5xzIRtzheHVpj1Xyh63SFz8uXOZKYw&v=3&callback=initMap" onerror="onMapError()">
     </script>
 </body>
 </html>

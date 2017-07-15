@@ -430,3 +430,11 @@ function initMap() {
     var mainViewModel = new MainViewModel(mapHandler);
     ko.applyBindings(mainViewModel);
 }
+
+/**
+ * @description Error handler for Google Map.
+ */
+function onMapError() {
+    $('#errorMessage').html('Google Maps cannot be loaded. Please try again later');
+    $('#modalError').modal();
+}
